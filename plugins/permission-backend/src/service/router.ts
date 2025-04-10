@@ -61,31 +61,37 @@ const attributesSchema: z.ZodSchema<PermissionAttributes> = z.object({
     .optional(),
 });
 
-const permissionSchema = z.union([
-  z.object({
-    type: z.literal('basic'),
-    name: z.string(),
-    attributes: attributesSchema,
-  }),
-  z.object({
-    type: z.literal('resource'),
-    name: z.string(),
-    attributes: attributesSchema,
-    resourceType: z.string(),
-  }),
-]);
+const basicPermissionSchema = z.object({
+  type: z.literal('basic'),
+  name: z.string(),
+  attributes: attributesSchema,
+});
+
+const resourcePermissionSchema = z.object({
+  type: z.literal('resource'),
+  name: z.string(),
+  attributes: attributesSchema,
+  resourceType: z.string(),
+});
 
 const evaluatePermissionRequestSchema = z.union([
   z.object({
     id: z.string(),
-    resourceRef: z.string().optional(),
+    resourceRef: z.undefined().optional(),
     resourceRefs: z.undefined().optional(),
-    permission: permissionSchema,
+    permission: basicPermissionSchema,
   }),
   z.object({
     id: z.string(),
+    resourceRef: z.string().optional(),
+    resourceRefs: z.undefined().optional(),
+    permission: resourcePermissionSchema,
+  }),
+  z.object({
+    id: z.string(),
+    resourceRef: z.undefined().optional(),
     resourceRefs: z.array(z.string()),
-    permission: permissionSchema,
+    permission: resourcePermissionSchema,
   }),
 ]);
 
